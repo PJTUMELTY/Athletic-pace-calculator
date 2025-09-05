@@ -546,7 +546,11 @@
                             <div className="bg-white rounded-2xl shadow-xl p-8">
                                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Results</h2>
                                 
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                                    <div className="bg-yellow-50 rounded-xl p-6 text-center">
+                                        <div className="text-2xl font-bold text-yellow-600">{results.pacePerLap}</div>
+                                        <div className="text-sm text-gray-600">{results.lapLabel}</div>
+                                    </div>
                                     <div className="bg-blue-50 rounded-xl p-6 text-center">
                                         <div className="text-2xl font-bold text-blue-600">{results.pacePerKm}</div>
                                         <div className="text-sm text-gray-600">per kilometer</div>
@@ -554,20 +558,6 @@
                                     <div className="bg-green-50 rounded-xl p-6 text-center">
                                         <div className="text-2xl font-bold text-green-600">{results.pacePerMile}</div>
                                         <div className="text-sm text-gray-600">per mile</div>
-                                    </div>
-                                    {results.pacePerLap && (
-                                        <div className="bg-yellow-50 rounded-xl p-6 text-center">
-                                            <div className="text-2xl font-bold text-yellow-600">{results.pacePerLap}</div>
-                                            <div className="text-sm text-gray-600">{results.lapLabel || 'per lap'}</div>
-                                        </div>
-                                    )}
-                                    <div className="bg-purple-50 rounded-xl p-6 text-center">
-                                        <div className="text-2xl font-bold text-purple-600">{results.speedKmh}</div>
-                                        <div className="text-sm text-gray-600">km/h</div>
-                                    </div>
-                                    <div className="bg-orange-50 rounded-xl p-6 text-center">
-                                        <div className="text-2xl font-bold text-orange-600">{results.speedMph}</div>
-                                        <div className="text-sm text-gray-600">mph</div>
                                     </div>
                                 </div>
 
