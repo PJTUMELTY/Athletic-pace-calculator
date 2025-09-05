@@ -484,7 +484,7 @@
                                                 const standardDistances = Object.keys(trackDistances[trackType]).map(d => parseInt(d));
                                                 const matchingDistance = standardDistances.find(dist => {
                                                     const expectedLaps = trackDistances[trackType][dist].laps;
-                                                    return Math.abs(expectedLaps - validLapTimes.length) < 0.01;
+                                                    return Math.abs(expectedLaps - lapTimes.length) < 0.01;
                                                 });
                                                 
                                                 let lapNote = '';
