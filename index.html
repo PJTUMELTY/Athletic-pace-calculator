@@ -555,10 +555,12 @@
                                         <div className="text-2xl font-bold text-green-600">{results.pacePerMile}</div>
                                         <div className="text-sm text-gray-600">per mile</div>
                                     </div>
-                                    <div className="bg-yellow-50 rounded-xl p-6 text-center">
-                                        <div className="text-2xl font-bold text-yellow-600">{results.pacePerLap}</div>
-                                        <div className="text-sm text-gray-600">{results.lapLabel}</div>
-                                    </div>
+                                    {results.pacePerLap && (
+                                        <div className="bg-yellow-50 rounded-xl p-6 text-center">
+                                            <div className="text-2xl font-bold text-yellow-600">{results.pacePerLap}</div>
+                                            <div className="text-sm text-gray-600">{results.lapLabel || 'per lap'}</div>
+                                        </div>
+                                    )}
                                     <div className="bg-purple-50 rounded-xl p-6 text-center">
                                         <div className="text-2xl font-bold text-purple-600">{results.speedKmh}</div>
                                         <div className="text-sm text-gray-600">km/h</div>
