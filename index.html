@@ -548,8 +548,12 @@
                                 
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                                     <div className="bg-yellow-50 rounded-xl p-6 text-center">
-                                        <div className="text-2xl font-bold text-yellow-600">{results.pacePerLap}</div>
-                                        <div className="text-sm text-gray-600">{results.lapLabel}</div>
+                                        <div className="text-2xl font-bold text-yellow-600">
+                                            {results.pacePerLap || "N/A"}
+                                        </div>
+                                        <div className="text-sm text-gray-600">
+                                            {trackType === 'outdoor' ? 'per lap (400m)' : 'per lap (200m)'}
+                                        </div>
                                     </div>
                                     <div className="bg-blue-50 rounded-xl p-6 text-center">
                                         <div className="text-2xl font-bold text-blue-600">{results.pacePerKm}</div>
