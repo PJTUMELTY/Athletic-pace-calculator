@@ -252,12 +252,12 @@
 
             const generateSplits = (totalDistanceMeters, totalTimeSeconds) => {
                 const splits = [];
-                const splitDistances = [1000, 1609.34, 5000];
+                const splitDistances = [1000, 1609.34];
                 
                 splitDistances.forEach(splitDist => {
                     if (splitDist <= totalDistanceMeters) {
                         const splitTime = (totalTimeSeconds * splitDist) / totalDistanceMeters;
-                        const splitName = splitDist === 1000 ? '1km' : splitDist === 1609.34 ? '1 mile' : '5km';
+                        const splitName = splitDist === 1000 ? '1km' : '1 mile';
                         splits.push({
                             distance: splitName,
                             time: secondsToTimeString(splitTime)
