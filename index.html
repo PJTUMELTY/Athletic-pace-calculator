@@ -394,7 +394,7 @@
                                             <div className="flex gap-2">
                                                 <input
                                                     type="number"
-                                                    value={distance && (!Object.keys(trackDistances[trackType]).includes(distance) && !Object.keys(roadDistances).includes(distance)) ? distance : ''}
+                                                    value={distance && (!Object.keys(trackDistances[trackType]).includes(distance) && !roadDistances.some(rd => rd.distance.toString() === distance)) ? distance : ''}
                                                     onChange={(e) => setDistance(e.target.value)}
                                                     placeholder="Enter distance"
                                                     className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
