@@ -569,43 +569,45 @@
                                 </div>
 
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                                    <div>
-                                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Summary</h3>
-                                        <div className="space-y-3">
-                                            <div className="flex justify-between">
-                                                <span className="text-gray-600">Total Time:</span>
-                                                <span className="font-semibold">{results.totalTime}</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-gray-600">Distance:</span>
-                                                <span className="font-semibold">{results.distance}</span>
-                                            </div>
-                                            {results.trackInfo && results.trackInfo.standardDistance && (
+                                    {mode === 'lap' && (
+                                        <div>
+                                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Summary</h3>
+                                            <div className="space-y-3">
                                                 <div className="flex justify-between">
-                                                    <span className="text-gray-600">Race:</span>
-                                                    <span className="font-semibold text-blue-600">{results.trackInfo.standardDistance}m</span>
+                                                    <span className="text-gray-600">Total Time:</span>
+                                                    <span className="font-semibold">{results.totalTime}</span>
                                                 </div>
-                                            )}
-                                            {results.avgLapTime && (
-                                                <>
+                                                <div className="flex justify-between">
+                                                    <span className="text-gray-600">Distance:</span>
+                                                    <span className="font-semibold">{results.distance}</span>
+                                                </div>
+                                                {results.trackInfo && results.trackInfo.standardDistance && (
                                                     <div className="flex justify-between">
-                                                        <span className="text-gray-600">Avg Lap Time:</span>
-                                                        <span className="font-semibold">{results.avgLapTime}</span>
+                                                        <span className="text-gray-600">Race:</span>
+                                                        <span className="font-semibold text-blue-600">{results.trackInfo.standardDistance}m</span>
                                                     </div>
-                                                    <div className="flex justify-between">
-                                                        <span className="text-gray-600">Fastest Lap:</span>
-                                                        <span className="font-semibold text-green-600">{results.fastestLap}</span>
-                                                    </div>
-                                                    <div className="flex justify-between">
-                                                        <span className="text-gray-600">Slowest Lap:</span>
-                                                        <span className="font-semibold text-red-600">{results.slowestLap}</span>
-                                                    </div>
-                                                </>
-                                            )}
+                                                )}
+                                                {results.avgLapTime && (
+                                                    <>
+                                                        <div className="flex justify-between">
+                                                            <span className="text-gray-600">Avg Lap Time:</span>
+                                                            <span className="font-semibold">{results.avgLapTime}</span>
+                                                        </div>
+                                                        <div className="flex justify-between">
+                                                            <span className="text-gray-600">Fastest Lap:</span>
+                                                            <span className="font-semibold text-green-600">{results.fastestLap}</span>
+                                                        </div>
+                                                        <div className="flex justify-between">
+                                                            <span className="text-gray-600">Slowest Lap:</span>
+                                                            <span className="font-semibold text-red-600">{results.slowestLap}</span>
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
 
-                                    {results.splits && results.splits.length > 0 && (
+                                    {mode === 'lap' && results.splits && results.splits.length > 0 && (
                                         <div>
                                             <h3 className="text-lg font-semibold text-gray-900 mb-4">Projected Splits</h3>
                                             <div className="space-y-3">
