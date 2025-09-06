@@ -673,8 +673,14 @@
                                         </div>
                                         {trackType === 'road' && (
                                             <div className="bg-yellow-50 rounded-xl p-6 text-center">
-                                                <div className="text-2xl font-bold text-yellow-600">{results.pacePerKm}</div>
-                                                <div className="text-sm text-gray-600">per 1km</div>
+                                                <div className="text-2xl font-bold text-yellow-600">
+                                                    {(() => {
+                                                        const pacePerKmSeconds = timeStringToSeconds(results.pacePerKm);
+                                                        const lap400mSeconds = pacePerKmSeconds * 0.4;
+                                                        return secondsToTimeString(lap400mSeconds);
+                                                    })()}
+                                                </div>
+                                                <div className="text-sm text-gray-600">400m lap time</div>
                                             </div>
                                         )}
                                     </div>
