@@ -293,6 +293,15 @@
             const isTrackDistance = Object.keys(trackDistances[trackType]).includes(distance);
             const isRoadDistanceForLaps = roadDistances.some(rd => rd.distance === selectedLapDistance);
 
+            // Effect to update lap times when track type changes for already selected distance
+            useEffect(() => {
+                if (mode === 'lap' && selectedLapDistance && trackDistances[trackType][selectedLapDistance]) {
+                    const lapsNeeded = trackDistances[trackType][selectedLapDistance].laps;
+                    const newLapTimes = new Array(Math.ceil(lapsNeeded)).fill('');
+                    setLapTimes(newLapTimes);
+                }
+            }, [trackType, selectedLapDistance, mode]);
+
             return (
                 <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
                     <div className="max-w-4xl mx-auto">
