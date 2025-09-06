@@ -669,6 +669,12 @@
                                                 <div className="text-2xl font-bold text-green-600">{results.pacePerMile}</div>
                                                 <div className="text-sm text-gray-600">per mile</div>
                                             </div>
+                                            {trackType === 'road' && (
+                                                <div className="bg-yellow-50 rounded-xl p-6 text-center">
+                                                    <div className="text-2xl font-bold text-yellow-600">{results.pacePerKm}</div>
+                                                    <div className="text-sm text-gray-600">per 1km</div>
+                                                </div>
+                                            )}
                                         </>
                                     )}
                                 </div>
