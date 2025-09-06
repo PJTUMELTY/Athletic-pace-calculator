@@ -510,8 +510,7 @@
                                                 });
                                                 
                                                 // Check if current selection is a road distance
-                                                const selectedDistance = document.querySelector('select[onChange]')?.value;
-                                                const isRoadDistance = roadDistances.some(rd => rd.distance === selectedDistance);
+                                                const isRoadDistance = roadDistances.some(rd => rd.distance === selectedLapDistance);
                                                 
                                                 let lapNote = '';
                                                 if (matchingDistance && isLastLap) {
