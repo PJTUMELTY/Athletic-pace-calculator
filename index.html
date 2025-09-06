@@ -82,7 +82,8 @@
                     1609: { laps: 8.05, name: 'Mile (8.05 laps)' },
                     3000: { laps: 15, name: '3000m (15 laps)' },
                     5000: { laps: 25, name: '5000m (25 laps)' }
-                }
+                },
+                road: {}
             };
 
             const roadDistances = [
@@ -174,7 +175,7 @@
                 const speedKmh = (distanceInMeters / 1000) / (totalTimeInSeconds / 3600);
                 const speedMph = (distanceInMeters / 1609.34) / (totalTimeInSeconds / 3600);
                 
-                const lapDistance = trackType === 'outdoor' ? 400 : 200;
+                const lapDistance = trackType === 'outdoor' ? 400 : trackType === 'indoor' ? 200 : 1000;
                 const lapTime = totalTimeInSeconds * (lapDistance / distanceInMeters);
                 
                 return {
@@ -198,7 +199,7 @@
                 
                 let totalDistanceMeters;
                 let lapDetails;
-                const currentTrackDistance = trackType === 'outdoor' ? 400 : 200;
+                const currentTrackDistance = trackType === 'outdoor' ? 400 : trackType === 'indoor' ? 200 : 1000;
                 
                 const standardDistances = Object.keys(trackDistances[trackType]).map(d => parseInt(d));
                 const matchingDistance = standardDistances.find(dist => {
@@ -300,7 +301,13 @@
 
             const handleTrackTypeChange = (newTrackType) => {
                 setTrackType(newTrackType);
-                setLapDistance(newTrackType === 'outdoor' ? '400' : '200');
+                if (newTrackType === 'outdoor') {
+                    setLapDistance('400');
+                } else if (newTrackType === 'indoor') {
+                    setLapDistance('200');
+                } else {
+                    setLapDistance('road');
+                }
                 
                 // If we're in lap mode and have a selected distance, update lap times immediately
                 if (mode === 'lap' && selectedLapDistance && trackDistances[newTrackType] && trackDistances[newTrackType][selectedLapDistance]) {
@@ -367,6 +374,7 @@
                                             >
                                                 <option value="outdoor">Outdoor Track (400m)</option>
                                                 <option value="indoor">Indoor Track (200m)</option>
+                                                <option value="road">Road/CC</option>
                                             </select>
                                         </div>
                                         
@@ -477,6 +485,7 @@
                                             >
                                                 <option value="outdoor">Outdoor Track (400m)</option>
                                                 <option value="indoor">Indoor Track (200m)</option>
+                                                <option value="road">Road/CC</option>
                                             </select>
                                         </div>
                                         
@@ -539,7 +548,7 @@
                                         </div>
                                         <div className="space-y-3">
                                             {lapTimes.map((lapTime, index) => {
-                                                const currentTrackDistance = trackType === 'outdoor' ? 400 : 200;
+                                                const currentTrackDistance = trackType === 'outdoor' ? 400 : trackType === 'indoor' ? 200 : 1000;
                                                 const isLastLap = index === lapTimes.length - 1;
                                                 
                                                 const standardDistances = Object.keys(trackDistances[trackType]).map(d => parseInt(d));
@@ -557,7 +566,7 @@
                                                     }
                                                 }
                                                 
-                                                const placeholder = isRoadDistanceForLaps ? "1:15:32.50" : "1:11.88";
+                                                const placeholder = isRoadDistanceForLaps || trackType === 'road' ? "1:15:32.50" : "1:11.88";
                                                 
                                                 return (
                                                     <div key={index} className="flex gap-2">
@@ -615,7 +624,7 @@
                                             {results.lapTime && (
                                                 <div className="bg-purple-50 rounded-xl p-6 text-center">
                                                     <div className="text-2xl font-bold text-purple-600">{results.lapTime}</div>
-                                                    <div className="text-sm text-gray-600">lap time ({trackType === 'outdoor' ? '400m' : '200m'})</div>
+                                                    <div className="text-sm text-gray-600">lap time ({trackType === 'outdoor' ? '400m' : trackType === 'indoor' ? '200m' : 'avg per lap'})</div>
                                                 </div>
                                             )}
                                             <div className="bg-blue-50 rounded-xl p-6 text-center">
@@ -704,7 +713,7 @@
                                                 Lap Breakdown 
                                                 {results.trackInfo && (
                                                     <span className="text-sm font-normal text-gray-600">
-                                                        ({results.trackInfo.trackType === 'outdoor' ? '400m' : '200m'} track, {results.trackInfo.totalLaps} laps)
+                                                        ({results.trackInfo.trackType === 'outdoor' ? '400m' : results.trackInfo.trackType === 'indoor' ? '200m' : 'road/CC'} track, {results.trackInfo.totalLaps} laps)
                                                     </span>
                                                 )}
                                             </h3>
