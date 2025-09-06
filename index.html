@@ -579,6 +579,10 @@
                                                 <>
                                                     <div className="flex justify-between">
                                                         <span className="text-gray-600">Avg Lap Time:</span>
+                                                        <span className="font-semibold">{results.avgLapTime}</span>
+                                                    </div>
+                                                    <div className="flex justify-between">
+                                                        <span className="text-gray-600">Fastest Lap:</span>
                                                         <span className="font-semibold text-green-600">{results.fastestLap}</span>
                                                     </div>
                                                     <div className="flex justify-between">
@@ -649,8 +653,4 @@
         ReactDOM.render(<AthletePaceCalculator />, document.getElementById('root'));
     </script>
 </body>
-</html>semibold">{results.avgLapTime}</span>
-                                                    </div>
-                                                    <div className="flex justify-between">
-                                                        <span className="text-gray-600">Fastest Lap:</span>
-                                                        <span className="font-
+</html>
