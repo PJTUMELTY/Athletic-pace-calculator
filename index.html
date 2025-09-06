@@ -201,42 +201,61 @@
                 let lapDetails;
                 const currentTrackDistance = trackType === 'outdoor' ? 400 : trackType === 'indoor' ? 200 : 1000;
                 
-                const standardDistances = Object.keys(trackDistances[trackType]).map(d => parseInt(d));
-                const matchingDistance = standardDistances.find(dist => {
-                    const expectedLaps = trackDistances[trackType][dist].laps;
-                    return Math.abs(expectedLaps - lapTimes.length) < 0.01;
-                });
+                // Check if this is a road distance selection
+                const isSelectedRoadDistance = roadDistances.some(rd => rd.distance === selectedLapDistance);
                 
-                if (matchingDistance) {
-                    totalDistanceMeters = matchingDistance;
-                    
-                    const expectedLaps = trackDistances[trackType][matchingDistance].laps;
-                    const hasPartialLap = expectedLaps % 1 !== 0;
+                if (isSelectedRoadDistance) {
+                    // For road distances, use the actual distance from roadDistances
+                    totalDistanceMeters = parseFloat(selectedLapDistance);
                     
                     lapDetails = lapSeconds.map((time, i) => {
-                        const isLastLap = i === lapSeconds.length - 1;
-                        let lapDist = currentTrackDistance;
-                        
-                        if (hasPartialLap && isLastLap) {
-                            const partialLapFraction = expectedLaps % 1;
-                            lapDist = currentTrackDistance * partialLapFraction;
-                        }
-                        
+                        const avgLapDistance = totalDistanceMeters / validLapTimes.length;
                         return {
                             lap: i + 1,
                             time: secondsToTimeString(time),
-                            pace: secondsToTimeString(time / (lapDist / 1000)),
-                            distance: lapDist === currentTrackDistance ? `${currentTrackDistance}m` : `${lapDist}m`
+                            pace: secondsToTimeString(time / (avgLapDistance / 1000)),
+                            distance: `${(avgLapDistance / 1000).toFixed(2)}km`
                         };
                     });
                 } else {
-                    totalDistanceMeters = currentTrackDistance * validLapTimes.length;
-                    lapDetails = lapSeconds.map((time, i) => ({
-                        lap: i + 1,
-                        time: secondsToTimeString(time),
-                        pace: secondsToTimeString(time / (currentTrackDistance / 1000)),
-                        distance: `${currentTrackDistance}m`
-                    }));
+                    // Original track distance logic
+                    const standardDistances = Object.keys(trackDistances[trackType]).map(d => parseInt(d));
+                    const matchingDistance = standardDistances.find(dist => {
+                        const expectedLaps = trackDistances[trackType][dist].laps;
+                        return Math.abs(expectedLaps - lapTimes.length) < 0.01;
+                    });
+                    
+                    if (matchingDistance) {
+                        totalDistanceMeters = matchingDistance;
+                        
+                        const expectedLaps = trackDistances[trackType][matchingDistance].laps;
+                        const hasPartialLap = expectedLaps % 1 !== 0;
+                        
+                        lapDetails = lapSeconds.map((time, i) => {
+                            const isLastLap = i === lapSeconds.length - 1;
+                            let lapDist = currentTrackDistance;
+                            
+                            if (hasPartialLap && isLastLap) {
+                                const partialLapFraction = expectedLaps % 1;
+                                lapDist = currentTrackDistance * partialLapFraction;
+                            }
+                            
+                            return {
+                                lap: i + 1,
+                                time: secondsToTimeString(time),
+                                pace: secondsToTimeString(time / (lapDist / 1000)),
+                                distance: lapDist === currentTrackDistance ? `${currentTrackDistance}m` : `${lapDist}m`
+                            };
+                        });
+                    } else {
+                        totalDistanceMeters = currentTrackDistance * validLapTimes.length;
+                        lapDetails = lapSeconds.map((time, i) => ({
+                            lap: i + 1,
+                            time: secondsToTimeString(time),
+                            pace: secondsToTimeString(time / (currentTrackDistance / 1000)),
+                            distance: `${currentTrackDistance}m`
+                        }));
+                    }
                 }
                 
                 if (totalTimeInSeconds <= 0 || totalDistanceMeters <= 0) return null;
@@ -266,7 +285,7 @@
                         trackType: trackType,
                         lapDistance: currentTrackDistance,
                         totalLaps: validLapTimes.length,
-                        standardDistance: matchingDistance
+                        standardDistance: isSelectedRoadDistance ? parseFloat(selectedLapDistance) : matchingDistance
                     }
                 };
             };
