@@ -529,9 +529,14 @@
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                            Lap Times
-                                        </label>
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <label className="block text-sm font-semibold text-gray-700">
+                                                Lap Times
+                                            </label>
+                                            <span className="text-xs text-gray-500 font-medium">
+                                                {isRoadDistanceForLaps || trackType === 'road' ? 'Hr:Min:Sec' : 'Min:Sec'}
+                                            </span>
+                                        </div>
                                         <div className="space-y-3">
                                             {lapTimes.map((lapTime, index) => {
                                                 const currentTrackDistance = trackType === 'outdoor' ? 400 : 200;
