@@ -588,3 +588,154 @@
                                             Add Lap
                                         </button>
                                     </div>
+                                </div>
+                            )}
+
+                            <button
+                                onClick={calculate}
+                                className="w-full mt-8 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 px-6 rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 flex items-center justify-center gap-2 shadow-lg"
+                            >
+                                <Zap />
+                                Calculate Pace
+                            </button>
+                        </div>
+
+                        {results && (
+                            <div className="bg-white rounded-2xl shadow-xl p-8">
+                                <h2 className="text-2xl font-bold text-gray-900 mb-6">Results</h2>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                                    {mode === 'finishing' ? (
+                                        <>
+                                            {results.lapTime && (
+                                                <div className="bg-purple-50 rounded-xl p-6 text-center">
+                                                    <div className="text-2xl font-bold text-purple-600">{results.lapTime}</div>
+                                                    <div className="text-sm text-gray-600">lap time ({trackType === 'outdoor' ? '400m' : '200m'})</div>
+                                                </div>
+                                            )}
+                                            <div className="bg-blue-50 rounded-xl p-6 text-center">
+                                                <div className="text-2xl font-bold text-blue-600">{results.pacePerKm}</div>
+                                                <div className="text-sm text-gray-600">per kilometer</div>
+                                            </div>
+                                            <div className="bg-green-50 rounded-xl p-6 text-center">
+                                                <div className="text-2xl font-bold text-green-600">{results.pacePerMile}</div>
+                                                <div className="text-sm text-gray-600">per mile</div>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="bg-orange-50 rounded-xl p-6 text-center">
+                                                <div className="text-2xl font-bold text-orange-600">{results.totalTime}</div>
+                                                <div className="text-sm text-gray-600">finish time</div>
+                                            </div>
+                                            <div className="bg-blue-50 rounded-xl p-6 text-center">
+                                                <div className="text-2xl font-bold text-blue-600">{results.pacePerKm}</div>
+                                                <div className="text-sm text-gray-600">per kilometer</div>
+                                            </div>
+                                            <div className="bg-green-50 rounded-xl p-6 text-center">
+                                                <div className="text-2xl font-bold text-green-600">{results.pacePerMile}</div>
+                                                <div className="text-sm text-gray-600">per mile</div>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                    {mode === 'lap' && (
+                                        <div>
+                                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Summary</h3>
+                                            <div className="space-y-3">
+                                                <div className="flex justify-between">
+                                                    <span className="text-gray-600">Total Time:</span>
+                                                    <span className="font-semibold">{results.totalTime}</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-gray-600">Distance:</span>
+                                                    <span className="font-semibold">{results.distance}</span>
+                                                </div>
+                                                {results.trackInfo && results.trackInfo.standardDistance && (
+                                                    <div className="flex justify-between">
+                                                        <span className="text-gray-600">Race:</span>
+                                                        <span className="font-semibold text-blue-600">{results.trackInfo.standardDistance}m</span>
+                                                    </div>
+                                                )}
+                                                {results.avgLapTime && (
+                                                    <>
+                                                        <div className="flex justify-between">
+                                                            <span className="text-gray-600">Avg Lap Time:</span>
+                                                            <span className="font-semibold">{results.avgLapTime}</span>
+                                                        </div>
+                                                        <div className="flex justify-between">
+                                                            <span className="text-gray-600">Fastest Lap:</span>
+                                                            <span className="font-semibold text-green-600">{results.fastestLap}</span>
+                                                        </div>
+                                                        <div className="flex justify-between">
+                                                            <span className="text-gray-600">Slowest Lap:</span>
+                                                            <span className="font-semibold text-red-600">{results.slowestLap}</span>
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {mode === 'lap' && results.splits && results.splits.length > 0 && (
+                                        <div>
+                                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Projected Splits</h3>
+                                            <div className="space-y-3">
+                                                {results.splits.map((split, index) => (
+                                                    <div key={index} className="flex justify-between">
+                                                        <span className="text-gray-600">{split.distance}:</span>
+                                                        <span className="font-semibold">{split.time}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {results.lapDetails && (
+                                        <div className="lg:col-span-2">
+                                            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                                                Lap Breakdown 
+                                                {results.trackInfo && (
+                                                    <span className="text-sm font-normal text-gray-600">
+                                                        ({results.trackInfo.trackType === 'outdoor' ? '400m' : '200m'} track, {results.trackInfo.totalLaps} laps)
+                                                    </span>
+                                                )}
+                                            </h3>
+                                            <div className="overflow-x-auto">
+                                                <table className="w-full">
+                                                    <thead>
+                                                        <tr className="border-b">
+                                                            <th className="text-left py-2">Lap</th>
+                                                            <th className="text-left py-2">Distance</th>
+                                                            <th className="text-left py-2">Time</th>
+                                                            <th className="text-left py-2">Pace/km</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {results.lapDetails.map((lap, index) => (
+                                                            <tr key={index} className="border-b">
+                                                                <td className="py-2">{lap.lap}</td>
+                                                                <td className="py-2 text-sm text-gray-600">{lap.distance}</td>
+                                                                <td className="py-2 font-semibold">{lap.time}</td>
+                                                                <td className="py-2 text-gray-600">{lap.pace}</td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<AthletePaceCalculator />, document.getElementById('root'));
+    </script>
+</body>
+</html>
