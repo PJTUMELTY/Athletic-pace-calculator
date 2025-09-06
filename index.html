@@ -552,6 +552,12 @@
                                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Results</h2>
                                 
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                                    {results.lapTime && (
+                                        <div className="bg-purple-50 rounded-xl p-6 text-center">
+                                            <div className="text-2xl font-bold text-purple-600">{results.lapTime}</div>
+                                            <div className="text-sm text-gray-600">lap time ({trackType === 'outdoor' ? '400m' : '200m'})</div>
+                                        </div>
+                                    )}
                                     <div className="bg-blue-50 rounded-xl p-6 text-center">
                                         <div className="text-2xl font-bold text-blue-600">{results.pacePerKm}</div>
                                         <div className="text-sm text-gray-600">per kilometer</div>
@@ -560,12 +566,6 @@
                                         <div className="text-2xl font-bold text-green-600">{results.pacePerMile}</div>
                                         <div className="text-sm text-gray-600">per mile</div>
                                     </div>
-                                    {results.lapTime && (
-                                        <div className="bg-purple-50 rounded-xl p-6 text-center">
-                                            <div className="text-2xl font-bold text-purple-600">{results.lapTime}</div>
-                                            <div className="text-sm text-gray-600">lap time ({trackType === 'outdoor' ? '400m' : '200m'})</div>
-                                        </div>
-                                    )}
                                 </div>
 
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
