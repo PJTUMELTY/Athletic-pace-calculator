@@ -158,11 +158,16 @@
                 const speedKmh = (distanceInMeters / 1000) / (totalTimeInSeconds / 3600);
                 const speedMph = (distanceInMeters / 1609.34) / (totalTimeInSeconds / 3600);
                 
+                // Calculate lap time based on track type
+                const lapDistance = trackType === 'outdoor' ? 400 : 200;
+                const lapTime = totalTimeInSeconds * (lapDistance / distanceInMeters);
+                
                 return {
                     totalTime: secondsToTimeString(totalTimeInSeconds),
                     distance: `${distance} ${distanceUnit}`,
                     pacePerKm: secondsToTimeString(pacePerKm),
                     pacePerMile: secondsToTimeString(pacePerMile),
+                    lapTime: secondsToTimeString(lapTime),
                     speedKmh: speedKmh.toFixed(2),
                     speedMph: speedMph.toFixed(2),
                     splits: generateSplits(distanceInMeters, totalTimeInSeconds)
