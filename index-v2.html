@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Athletic Pace Calculator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const Calculator = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="4" y="2" width="16" height="20" rx="2"/>
+                <line x1="8" y1="6" x2="16" y2="6"/>
+                <line x1="16" y1="10" x2="16" y2="10"/>
+                <line x1="8" y1="10" x2="8" y2="10"/>
+                <line x1="12" y1="10" x2="12" y2="10"/>
+                <line x1="8" y1="14" x2="16" y2="14"/>
+                <line x1="8" y1="18" x2="16" y2="18"/>
+            </svg>
+        );
+
+        const Clock = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12,6 12,12 16,14"/>
+            </svg>
+        );
+
+        const Flag = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+                <line x1="4" y1="22" x2="4" y2="15"/>
+            </svg>
+        );
+
+        const Zap = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/>
+            </svg>
+        );
+
+        const AthletePaceCalculator = () => {
+            const [mode, setMode] = useState('finishing');
+            const [distance, setDistance] = useState('');
+            const [distanceUnit, setDistanceUnit] = useState('meters');
+            const [time, setTime] = useState({ hours: '', minutes: '', seconds: '' });
+            const [lapDistance, setLapDistance] = useState('400');
+            const [trackType, setTrackType] = useState('outdoor');
+            const [lapTimes, setLapTimes] = useState([{ hours: '', minutes: '', seconds: '', hundredths: '' }]);
+            const [results, setResults] = useState(null);
+            const [selectedLapDistance, setSelectedLapDistance] = useState('');
+
+            const trackDistances = {
+                outdoor: {
+                    400: { laps: 1, name: '400m (1 lap)' },
+                    800: { laps: 2, name: '800m (2 laps)' },
+                    1500: { laps: 3.75, name: '1500m (3.75 laps)' },
+                    1609: { laps: 4.02, name: 'Mile (4.02 laps)' },
+                    3000: { laps: 7.5, name: '3000m (7.5 laps)' },
+                    5000: { laps: 12.5, name: '5000m (12.5 laps)' },
+                    10000: { laps: 25, name: '10000m (25 laps)' }
+                },
+                indoor: {
+                    200: { laps: 1, name: '200m (1 lap)' },
+                    400: { laps: 2, name: '400m (2 laps)' },
+                    800: { laps: 4, name: '800m (4 laps)' },
+                    1500: { laps: 7.5, name: '1500m (7.5 laps)' },
+                    1609: { laps: 8.05, name: 'Mile (8.05 laps)' },
+                    3000: { laps: 15, name: '3000m (15 laps)' },
+                    5000: { laps: 25, name: '5000m (25 laps)' }
+                },
+                road: {}
+            };
+
+            const roadDistances = [
+                { distance: '15000', name: '15km' },
+                { distance: '16093.4', name: '10 Mile' },
+                { distance: '21097.5', name: 'Half Marathon (21.1km)' },
+                { distance: '42195', name: 'Marathon (42.2km)' }
+            ];
+
+            // Effect to update lap times when track type changes for already selected distance
+            useEffect(() => {
+                if (mode === 'lap' && selectedLapDistance && trackDistances[trackType] && trackDistances[trackType][selectedLapDistance]) {
+                    const lapsNeeded = trackDistances[trackType][selectedLapDistance].laps;
+                    const newLapTimes = new Array(Math.ceil(lapsNeeded)).fill().map(() => ({ hours: '', minutes: '', seconds: '', hundredths: '' }));
+                    setLapTimes(newLapTimes);
+                }
+            }, [trackType, selectedLapDistance, mode]);
+
+            const addLapTime = () => {
+                setLapTimes([...lapTimes, { hours: '', minutes: '', seconds: '', hundredths: '' }]);
+            };
+
+            const removeLapTime = (index) => {
+                if (lapTimes.length > 1) {
+                    const newLapTimes = lapTimes.filter((_, i) => i !== index);
+                    setLapTimes(newLapTimes);
+                }
+            };
+
+            const updateLapTime = (index, field, value) => {
+                const newLapTimes = [...lapTimes];
+                newLapTimes[index] = { ...newLapTimes[index], [field]: value };
+                setLapTimes(newLapTimes);
+            };
+
+            const dropdownTimeToSeconds = (timeObj) => {
+                const hours = parseFloat(timeObj.hours) || 0;
+                const minutes = parseFloat(timeObj.minutes) || 0;
+                const seconds = parseFloat(timeObj.seconds) || 0;
+                const hundredths = parseFloat(timeObj.hundredths) || 0;
+                
+                return hours * 3600 + minutes * 60 + seconds + (hundredths / 100);
+            };
+
+            const timeStringToSeconds = (timeStr) => {
+                if (!timeStr || timeStr.trim() === '') return 0;
+                
+                const colonCount = (timeStr.match(/:/g) || []).length;
+                
+                if (colonCount === 0) {
+                    return parseFloat(timeStr) || 0;
+                } else if (colonCount === 1) {
+                    const [minutes, seconds] = timeStr.split(':');
+                    return (parseFloat(minutes) || 0) * 60 + (parseFloat(seconds) || 0);
+                } else if (colonCount === 2) {
+                    const [hours, minutes, seconds] = timeStr.split(':');
+                    return (parseFloat(hours) || 0) * 3600 + (parseFloat(minutes) || 0) * 60 + (parseFloat(seconds) || 0);
+                }
+                
+                return 0;
+            };
+
+            const secondsToTimeString = (totalSeconds) => {
+                const hours = Math.floor(totalSeconds / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60;
+                
+                if (hours > 0) {
+                    return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toFixed(2).padStart(5, '0')}`;
+                } else {
+                    return `${minutes}:${seconds.toFixed(2).padStart(5, '0')}`;
+                }
+            };
+
+            const convertDistance = (dist, unit) => {
+                const conversions = {
+                    meters: 1,
+                    kilometers: 1000,
+                    miles: 1609.34,
+                    yards: 0.9144,
+                    feet: 0.3048
+                };
+                return dist * conversions[unit];
+            };
+
+            const calculateFromFinishing = () => {
+                const totalHours = parseFloat(time.hours) || 0;
+                const totalMinutes = parseFloat(time.minutes) || 0;
+                const totalSeconds = parseFloat(time.seconds) || 0;
+                
+                const totalTimeInSeconds = totalHours * 3600 + totalMinutes * 60 + totalSeconds;
+                const distanceInMeters = convertDistance(parseFloat(distance), distanceUnit);
+                
+                if (totalTimeInSeconds <= 0 || distanceInMeters <= 0) return null;
+                
+                const pacePerKm = totalTimeInSeconds / (distanceInMeters / 1000);
+                const pacePerMile = totalTimeInSeconds / (distanceInMeters / 1609.34);
+                const speedKmh = (distanceInMeters / 1000) / (totalTimeInSeconds / 3600);
+                const speedMph = (distanceInMeters / 1609.34) / (totalTimeInSeconds / 3600);
+                
+                const lapDistance = trackType === 'outdoor' ? 400 : trackType === 'indoor' ? 200 : 1000;
+                const lapTime = totalTimeInSeconds * (lapDistance / distanceInMeters);
+                
+                return {
+                    totalTime: secondsToTimeString(totalTimeInSeconds),
+                    distance: `${distance} ${distanceUnit}`,
+                    pacePerKm: secondsToTimeString(pacePerKm),
+                    pacePerMile: secondsToTimeString(pacePerMile),
+                    lapTime: secondsToTimeString(lapTime),
+                    speedKmh: speedKmh.toFixed(2),
+                    speedMph: speedMph.toFixed(2),
+                    splits: generateSplits(distanceInMeters, totalTimeInSeconds)
+                };
+            };
+
+            const calculateFromLaps = () => {
+                const validLapTimes = lapTimes.filter(lap => 
+                    lap.hours !== '' || lap.minutes !== '' || lap.seconds !== '' || lap.hundredths !== ''
+                );
+                if (validLapTimes.length === 0) return null;
+                
+                const lapSeconds = validLapTimes.map(dropdownTimeToSeconds);
+                const totalTimeInSeconds = lapSeconds.reduce((sum, time) => sum + time, 0);
+                
+                let totalDistanceMeters;
+                let lapDetails;
+                const currentTrackDistance = trackType === 'outdoor' ? 400 : trackType === 'indoor' ? 200 : 1000;
+                
+                // Check if this is a road distance selection
+                const isSelectedRoadDistance = roadDistances.some(rd => rd.distance === selectedLapDistance);
+                
+                if (isSelectedRoadDistance) {
+                    // For road distances, use the actual distance from roadDistances
+                    totalDistanceMeters = parseFloat(selectedLapDistance);
+                    
+                    lapDetails = lapSeconds.map((time, i) => {
+                        const avgLapDistance = totalDistanceMeters / validLapTimes.length;
+                        return {
+                            lap: i + 1,
+                            time: secondsToTimeString(time),
+                            pace: secondsToTimeString(time / (avgLapDistance / 1000)),
+                            distance: `${(avgLapDistance / 1000).toFixed(2)}km`
+                        };
+                    });
+                } else {
+                    // Original track distance logic
+                    const standardDistances = Object.keys(trackDistances[trackType]).map(d => parseInt(d));
+                    const matchingDistance = standardDistances.find(dist => {
+                        const expectedLaps = trackDistances[trackType][dist].laps;
+                        return Math.abs(expectedLaps - lapTimes.length) < 0.01;
+                    });
+                    
+                    if (matchingDistance) {
+                        totalDistanceMeters = matchingDistance;
+                        
+                        const expectedLaps = trackDistances[trackType][matchingDistance].laps;
+                        const hasPartialLap = expectedLaps % 1 !== 0;
+                        
+                        lapDetails = lapSeconds.map((time, i) => {
+                            const isLastLap = i === lapSeconds.length - 1;
+                            let lapDist = currentTrackDistance;
+                            
+                            if (hasPartialLap && isLastLap) {
+                                const partialLapFraction = expectedLaps % 1;
+                                lapDist = currentTrackDistance * partialLapFraction;
+                            }
+                            
+                            return {
+                                lap: i + 1,
+                                time: secondsToTimeString(time),
+                                pace: secondsToTimeString(time / (lapDist / 1000)),
+                                distance: lapDist === currentTrackDistance ? `${currentTrackDistance}m` : `${lapDist}m`
+                            };
+                        });
+                    } else {
+                        totalDistanceMeters = currentTrackDistance * validLapTimes.length;
+                        lapDetails = lapSeconds.map((time, i) => ({
+                            lap: i + 1,
+                            time: secondsToTimeString(time),
+                            pace: secondsToTimeString(time / (currentTrackDistance / 1000)),
+                            distance: `${currentTrackDistance}m`
+                        }));
+                    }
+                }
+                
+                if (totalTimeInSeconds <= 0 || totalDistanceMeters <= 0) return null;
+                
+                const pacePerKm = totalTimeInSeconds / (totalDistanceMeters / 1000);
+                const pacePerMile = totalTimeInSeconds / (totalDistanceMeters / 1609.34);
+                const speedKmh = (totalDistanceMeters / 1000) / (totalTimeInSeconds / 3600);
+                const speedMph = (totalDistanceMeters / 1609.34) / (totalTimeInSeconds / 3600);
+                
+                const avgLapTime = totalTimeInSeconds / validLapTimes.length;
+                const fastestLap = Math.min(...lapSeconds);
+                const slowestLap = Math.max(...lapSeconds);
+                
+                return {
+                    totalTime: secondsToTimeString(totalTimeInSeconds),
+                    distance: `${(totalDistanceMeters / 1000).toFixed(2)} km`,
+                    distanceMeters: totalDistanceMeters,
+                    pacePerKm: secondsToTimeString(pacePerKm),
+                    pacePerMile: secondsToTimeString(pacePerMile),
+                    speedKmh: speedKmh.toFixed(2),
+                    speedMph: speedMph.toFixed(2),
+                    avgLapTime: secondsToTimeString(avgLapTime),
+                    fastestLap: secondsToTimeString(fastestLap),
+                    slowestLap: secondsToTimeString(slowestLap),
+                    lapDetails: lapDetails,
+                    trackInfo: {
+                        trackType: trackType,
+                        lapDistance: currentTrackDistance,
+                        totalLaps: validLapTimes.length,
+                        standardDistance: isSelectedRoadDistance ? parseFloat(selectedLapDistance) : matchingDistance
+                    }
+                };
+            };
+
+            const generateSplits = (totalDistanceMeters, totalTimeSeconds) => {
+                const splits = [];
+                const splitDistances = [1000, 1609.34];
+                
+                splitDistances.forEach(splitDist => {
+                    if (splitDist <= totalDistanceMeters) {
+                        const splitTime = (totalTimeSeconds * splitDist) / totalDistanceMeters;
+                        const splitName = splitDist === 1000 ? '1km' : '1 mile';
+                        splits.push({
+                            distance: splitName,
+                            time: secondsToTimeString(splitTime)
+                        });
+                    }
+                });
+                
+                return splits;
+            };
+
+            const calculate = () => {
+                let result;
+                if (mode === 'finishing') {
+                    result = calculateFromFinishing();
+                } else {
+                    result = calculateFromLaps();
+                }
+                setResults(result);
+            };
+
+            const handleTrackTypeChange = (newTrackType) => {
+                setTrackType(newTrackType);
+                if (newTrackType === 'outdoor') {
+                    setLapDistance('400');
+                } else if (newTrackType === 'indoor') {
+                    setLapDistance('200');
+                } else {
+                    setLapDistance('road');
+                }
+                
+                // If we're in lap mode and have a selected distance, update lap times immediately
+                if (mode === 'lap' && selectedLapDistance && trackDistances[newTrackType] && trackDistances[newTrackType][selectedLapDistance]) {
+                    const lapsNeeded = trackDistances[newTrackType][selectedLapDistance].laps;
+                    const newLapTimes = new Array(Math.ceil(lapsNeeded)).fill().map(() => ({ hours: '', minutes: '', seconds: '', hundredths: '' }));
+                    setLapTimes(newLapTimes);
+                }
+            };
+
+            const isRoadDistance = roadDistances.some(rd => rd.distance === distance);
+            const isTrackDistance = Object.keys(trackDistances[trackType]).includes(distance);
+            const isRoadDistanceForLaps = roadDistances.some(rd => rd.distance === selectedLapDistance);
+            
+            // Determine if road event is selected to restrict track type options
+            const isRoadEventSelected = mode === 'finishing' ? isRoadDistance : isRoadDistanceForLaps;
+
+            return (
+                <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+                    <div className="max-w-4xl mx-auto">
+                        <div className="bg-white rounded-2xl shadow-xl p-8 mb-6">
+                            <div className="flex items-center gap-3 mb-8">
+                                <div className="bg-blue-600 p-3 rounded-lg text-white">
+                                    <Calculator />
+                                </div>
+                                <div>
+                                    <h1 className="text-3xl font-bold text-gray-900">Athletic Pace Calculator</h1>
+                                    <p className="text-gray-600">Calculate your running pace and splits with accurate track distances</p>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-4 mb-8">
+                                <button
+                                    onClick={() => setMode('finishing')}
+                                    className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${
+                                        mode === 'finishing'
+                                            ? 'bg-blue-600 text-white shadow-lg'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    }`}
+                                >
+                                    <Flag />
+                                    Finishing Time
+                                </button>
+                                <button
+                                    onClick={() => setMode('lap')}
+                                    className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${
+                                        mode === 'lap'
+                                            ? 'bg-blue-600 text-white shadow-lg'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    }`}
+                                >
+                                    <Clock />
+                                    Lap Times
+                                </button>
+                            </div>
+
+                            {mode === 'finishing' ? (
+                                <div className="space-y-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                                Track Type
+                                            </label>
+                                            <select
+                                                value={trackType}
+                                                onChange={(e) => handleTrackTypeChange(e.target.value)}
+                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            >
+                                                <option value="outdoor">Outdoor Track (400m)</option>
+                                                {!isRoadEventSelected && <option value="indoor">Indoor Track (200m)</option>}
+                                                <option value="road">Road/CC</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div>
+                                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                                Race Distance
+                                            </label>
+                                            <select
+                                                value={distance && (isTrackDistance || isRoadDistance) ? distance : ''}
+                                                onChange={(e) => {
+                                                    if (e.target.value === 'custom' || e.target.value === '') {
+                                                        setDistance('');
+                                                        return;
+                                                    }
+                                                    const selectedDistance = parseFloat(e.target.value);
+                                                    setDistance(selectedDistance.toString());
+                                                    setDistanceUnit('meters');
+                                                }}
+                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            >
+                                                <option value="">Select a race distance...</option>
+                                                <optgroup label="Track Events">
+                                                    {Object.entries(trackDistances[trackType]).map(([distance, info]) => (
+                                                        <option key={distance} value={distance}>
+                                                            {info.name}
+                                                        </option>
+                                                    ))}
+                                                </optgroup>
+                                                <optgroup label="Road Events">
+                                                    {roadDistances.map((road) => (
+                                                        <option key={road.distance} value={road.distance}>
+                                                            {road.name}
+                                                        </option>
+                                                    ))}
+                                                </optgroup>
+                                                <option value="custom">Custom distance</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    {(!distance || (!isTrackDistance && !isRoadDistance)) && (
+                                        <div>
+                                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                                Custom Distance
+                                            </label>
+                                            <div className="flex gap-2">
+                                                <input
+                                                    type="number"
+                                                    value={distance && (!isTrackDistance && !isRoadDistance) ? distance : ''}
+                                                    onChange={(e) => setDistance(e.target.value)}
+                                                    placeholder="Enter distance"
+                                                    className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                />
+                                                <select
+                                                    value={distanceUnit}
+                                                    onChange={(e) => setDistanceUnit(e.target.value)}
+                                                    className="px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                                                >
+                                                    <option value="meters">m</option>
+                                                    <option value="kilometers">km</option>
+                                                    <option value="miles">mi</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                            Finishing Time
+                                        </label>
+                                        <div className="grid grid-cols-3 gap-2 max-w-md">
+                                            <input
+                                                type="number"
+                                                value={time.hours}
+                                                onChange={(e) => setTime({...time, hours: e.target.value})}
+                                                placeholder="Hours"
+                                                className="px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center"
+                                            />
+                                            <input
+                                                type="number"
+                                                value={time.minutes}
+                                                onChange={(e) => setTime({...time, minutes: e.target.value})}
+                                                placeholder="Minutes"
+                                                className="px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center"
+                                            />
+                                            <input
+                                                type="number"
+                                                step="0.01"
+                                                value={time.seconds}
+                                                onChange={(e) => setTime({...time, seconds: e.target.value})}
+                                                placeholder="Seconds"
+                                                className="px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="space-y-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                                Track Type
+                                            </label>
+                                            <select
+                                                value={trackType}
+                                                onChange={(e) => handleTrackTypeChange(e.target.value)}
+                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            >
+                                                <option value="outdoor">Outdoor Track (400m)</option>
+                                                {!isRoadEventSelected && <option value="indoor">Indoor Track (200m)</option>}
+                                                <option value="road">Road/CC</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div>
+                                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                                Race Distance
+                                            </label>
+                                            <select
+                                                value={selectedLapDistance}
+                                                onChange={(e) => {
+                                                    setSelectedLapDistance(e.target.value);
+                                                    if (e.target.value === 'custom') {
+                                                        return;
+                                                    }
+                                                    if (e.target.value === '') {
+                                                        setLapTimes([{ hours: '', minutes: '', seconds: '', hundredths: '' }]);
+                                                        return;
+                                                    }
+                                                    const distance = parseInt(e.target.value);
+                                                    // Only auto-set lap count for track distances
+                                                    if (trackDistances[trackType][distance]) {
+                                                        const lapsNeeded = trackDistances[trackType][distance].laps;
+                                                        const newLapTimes = new Array(Math.ceil(lapsNeeded)).fill().map(() => ({ hours: '', minutes: '', seconds: '', hundredths: '' }));
+                                                        setLapTimes(newLapTimes);
+                                                    } else {
+                                                        // For road distances, just start with one lap
+                                                        setLapTimes([{ hours: '', minutes: '', seconds: '', hundredths: '' }]);
+                                                    }
+                                                }}
+                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            >
+                                                <option value="">Select a race distance...</option>
+                                                <optgroup label="Track Events">
+                                                    {Object.entries(trackDistances[trackType]).map(([distance, info]) => (
+                                                        <option key={distance} value={distance}>
+                                                            {info.name}
+                                                        </option>
+                                                    ))}
+                                                </optgroup>
+                                                <optgroup label="Road Events">
+                                                    {roadDistances.map((road) => (
+                                                        <option key={road.distance} value={road.distance}>
+                                                            {road.name}
+                                                        </option>
+                                                    ))}
+                                                </optgroup>
+                                                <option value="custom">Custom distance</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <label className="block text-sm font-semibold text-gray-700">
+                                                Lap Times
+                                            </label>
+                                            <span className="text-xs text-gray-500 font-medium">
+                                                Mobile-Friendly Dropdowns
+                                            </span>
+                                        </div>
+                                        <div
