@@ -509,6 +509,10 @@
                                                     return Math.abs(expectedLaps - lapTimes.length) < 0.01;
                                                 });
                                                 
+                                                // Check if current selection is a road distance
+                                                const selectedDistance = document.querySelector('select[onChange]')?.value;
+                                                const isRoadDistance = roadDistances.some(rd => rd.distance === selectedDistance);
+                                                
                                                 let lapNote = '';
                                                 if (matchingDistance && isLastLap) {
                                                     const expectedLaps = trackDistances[trackType][matchingDistance].laps;
@@ -517,6 +521,8 @@
                                                         lapNote = ` (${partialDistance}m)`;
                                                     }
                                                 }
+                                                
+                                                const placeholder = isRoadDistance ? "1:15:32.50" : "1:11.88";
                                                 
                                                 return (
                                                     <div key={index} className="flex gap-2">
@@ -530,7 +536,7 @@
                                                             type="text"
                                                             value={lapTime}
                                                             onChange={(e) => updateLapTime(index, e.target.value)}
-                                                            placeholder="1:11.88"
+                                                            placeholder={placeholder}
                                                             className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                                         />
                                                         {lapTimes.length > 1 && (
